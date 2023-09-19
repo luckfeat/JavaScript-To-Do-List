@@ -1,0 +1,19 @@
+{
+  "todos": [
+    {
+      "content": "운동",
+      "completed": false,
+      "id": 1
+    },
+    {
+      "content": "식단",
+      "completed": false,
+      "id": 2
+    },
+    {
+      "content": "코딩",
+      "completed": false,
+      "id": 3
+    }
+  ]
+}

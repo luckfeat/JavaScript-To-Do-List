@@ -1,0 +1,55 @@
+body {
+  font-family: 'Inter', sans-serif;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  margin: 0;
+}
+
+button > i {
+  pointer-events: none;
+}
+
+.wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #d0e7d2;
+}
+
+.header {
+  margin: 9px;
+  font-size: 30px;
+}
+
+.todo_form {
+  margin: 9px;
+}
+
+.todos .item {
+  display: flex;
+  margin: 9px;
+}
+
+.content {
+  display: flex;
+}
+
+.content label {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.content input[type='text'] {
+  display: none;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.edit_buttons {
+  display: none;
+}
+
+.content_buttons {
+  display: block;
+}
