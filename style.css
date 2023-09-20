@@ -9,6 +9,10 @@ button > i {
   pointer-events: none;
 }
 
+button.current_page {
+  background-color: #ffcc70;
+}
+
 .wrap {
   display: flex;
   justify-content: center;
@@ -20,14 +24,18 @@ button > i {
 .header {
   margin: 9px;
   font-size: 30px;
+  text-align: center;
 }
 
 .todo_form {
   margin: 9px;
+  display: flex;
+  justify-content: center;
 }
 
 .todos .item {
   display: flex;
+  justify-content: space-between;
   margin: 9px;
 }
 
@@ -52,4 +60,10 @@ button > i {
 
 .content_buttons {
   display: block;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 10px;
 }
