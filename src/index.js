@@ -22,7 +22,7 @@ function createToDoElement(item) {
   return todoItem;
 }
 
-async function renderTodo() {
+async function renderTodoList() {
   const response = await fetch(URL);
   const todos = await response.json();
   const todoLength = todos.length;
@@ -84,14 +84,14 @@ async function renderPagination() {
 function renderAll() {
   return Promise.resolve()
     .then(() => {
-      renderTodo();
+      renderTodoList();
     })
     .then(() => {
       renderPagination();
     });
 }
 
-function createTodo() {
+function listenFormEvent() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const todo = {
@@ -126,7 +126,7 @@ function createTodo() {
   });
 }
 
-function addTodoEvent() {
+function listenTodoEvent() {
   todoTag.addEventListener('click', (e) => {
     const item = e.target.closest('.item');
     const label = item?.querySelector('label');
@@ -207,6 +207,6 @@ function addTodoEvent() {
 
 window.addEventListener('DOMContentLoaded', () => {
   renderAll();
-  createTodo();
-  addTodoEvent();
+  listenFormEvent();
+  listenTodoEvent();
 });
