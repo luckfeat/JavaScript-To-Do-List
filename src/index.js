@@ -7,7 +7,8 @@ const form = get('.todo_form');
 const formInput = get('.todo_input');
 
 let currentPage = 1;
-let maxPage;
+let maxPage = 1;
+let paginationPage;
 
 function get(target) {
   return document.querySelector(target);
@@ -29,14 +30,33 @@ async function renderTodoList() {
   const todoLimit = 10;
   const totalPage = Math.ceil(todoLength / todoLimit);
 
+  // console.log(`totalPage:${totalPage}`);
+  // console.log(`paginationPage:${paginationPage}`);
+  // console.log(`currentPage:${currentPage}`);
+
+  maxPage = totalPage;
+  // console.log(`todoLength:${todoLength}`);
+
+  // console.log(`${todoLength} = ${totalPage} * ${todoLimit} - 9`);
+  // console.log(totalPage * todoLimit - 9 === todoLength);
+  if (totalPage * todoLimit - 9 === todoLength) {
+    paginationPage !== currentPage ? (currentPage = maxPage) : currentPage;
+  }
+  // console.log(`maxPage:${maxPage}`);
+  // console.log(`currentPage:${currentPage} & totalPage:${totalPage}`);
+
   function render() {
     todoTag.innerHTML = '';
+    // console.log(`currentPage:${currentPage}`);
     for (
       let i = currentPage * todoLimit - todoLimit;
       i < (currentPage === totalPage ? todoLength : currentPage * todoLimit);
       i++
     ) {
-      if (!todos[i]) {
+      if (!todos[i] && todos[i - 1]) {
+        currentPage = currentPage - 1;
+        render();
+      } else if (!todos[i]) {
         alert('일이 없네요...');
         break;
       } else {
@@ -55,10 +75,8 @@ async function renderPagination() {
     const todoLength = todos.length;
     const todoLimit = 10;
     const totalPage = Math.ceil(todoLength / todoLimit);
-    maxPage = totalPage;
 
-    console.log(maxPage);
-
+    maxPage = totalPage === 0 ? 1 : totalPage;
     pagination.innerHTML = '';
 
     for (let i = 0; i < totalPage; i++) {
@@ -69,6 +87,8 @@ async function renderPagination() {
       pagination.append(paginationButton);
       paginationButton.addEventListener('click', (e) => {
         currentPage = Number(e.target.innerText);
+        paginationPage = Number(e.target.innerText);
+        // console.log(`renderPagination -> currentPage:${currentPage}`);
         renderAll();
       });
     }
@@ -82,13 +102,8 @@ async function renderPagination() {
 }
 
 function renderAll() {
-  return Promise.resolve()
-    .then(() => {
-      renderTodoList();
-    })
-    .then(() => {
-      renderPagination();
-    });
+  renderTodoList();
+  renderPagination();
 }
 
 function listenFormEvent() {
@@ -116,7 +131,7 @@ function listenFormEvent() {
       })
       .then(() => {
         currentPage = maxPage;
-        console.log(currentPage);
+        console.log(`form -> maxPage:${maxPage}`);
         formInput.value = '';
         formInput.focus();
       })
