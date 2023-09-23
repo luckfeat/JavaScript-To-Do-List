@@ -5,10 +5,12 @@ const todoTag = get('.todos');
 const pagination = get('.pagination');
 const form = get('.todo_form');
 const formInput = get('.todo_input');
+const todoLimit = 10;
 
 let currentPage = 1;
+let renderPage = 1;
+let paginationPage = 1;
 let maxPage = 1;
-let paginationPage;
 
 function get(target) {
   return document.querySelector(target);
@@ -27,34 +29,48 @@ async function renderTodoList() {
   const response = await fetch(URL);
   const todos = await response.json();
   const todoLength = todos.length;
-  const todoLimit = 10;
   const totalPage = Math.ceil(todoLength / todoLimit);
 
-  // console.log(`totalPage:${totalPage}`);
-  // console.log(`paginationPage:${paginationPage}`);
-  // console.log(`currentPage:${currentPage}`);
-
   maxPage = totalPage;
-  // console.log(`todoLength:${todoLength}`);
+  currentPage = renderPage;
 
-  // console.log(`${todoLength} = ${totalPage} * ${todoLimit} - 9`);
-  // console.log(totalPage * todoLimit - 9 === todoLength);
-  if (totalPage * todoLimit - 9 === todoLength) {
-    paginationPage !== currentPage ? (currentPage = maxPage) : currentPage;
+  console.log(
+    `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
+  );
+
+  const isFirstOfList = totalPage * todoLimit - (todoLimit - 1) === todoLength;
+
+  if (isFirstOfList) {
+    // console.log(totalPage * todoLimit - (todoLimit - 1) + ' is true');
+    renderPage = maxPage;
+    currentPage = renderPage;
+
+    // console.log(
+    //   `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
+    // );
+
+    const isOnPage = paginationPage !== 0;
+
+    if (isOnPage) {
+      renderPage = paginationPage;
+      currentPage = paginationPage;
+    }
+
+    // console.log(
+    //   `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
+    // );
   }
-  // console.log(`maxPage:${maxPage}`);
-  // console.log(`currentPage:${currentPage} & totalPage:${totalPage}`);
 
   function render() {
     todoTag.innerHTML = '';
-    // console.log(`currentPage:${currentPage}`);
     for (
-      let i = currentPage * todoLimit - todoLimit;
-      i < (currentPage === totalPage ? todoLength : currentPage * todoLimit);
+      let i = renderPage * todoLimit - todoLimit;
+      i < (renderPage === totalPage ? todoLength : renderPage * todoLimit);
       i++
     ) {
       if (!todos[i] && todos[i - 1]) {
-        currentPage = currentPage - 1;
+        renderPage -= 1;
+        currentPage -= 1;
         render();
       } else if (!todos[i]) {
         alert('일이 없네요...');
@@ -66,6 +82,10 @@ async function renderTodoList() {
   }
 
   render();
+  paginationPage = 0;
+  // console.log(
+  //   `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
+  // );
 }
 
 async function renderPagination() {
@@ -73,7 +93,6 @@ async function renderPagination() {
     const response = await fetch(URL);
     const todos = await response.json();
     const todoLength = todos.length;
-    const todoLimit = 10;
     const totalPage = Math.ceil(todoLength / todoLimit);
 
     maxPage = totalPage === 0 ? 1 : totalPage;
@@ -82,19 +101,55 @@ async function renderPagination() {
     for (let i = 0; i < totalPage; i++) {
       const paginationButton = document.createElement('button');
       paginationButton.className = 'pageNumber';
-      paginationButton.id = `page_${i + 1}`;
-      paginationButton.textContent = i + 1;
-      pagination.append(paginationButton);
+
+      if (i === 0) continue;
+
+      const isBetweenNumbers =
+        i >= currentPage - 1 &&
+        (currentPage === 1 ? i <= currentPage + 2 : i < currentPage + 2);
+
+      if (isBetweenNumbers) {
+        paginationButton.id = `page_${i}`;
+        paginationButton.textContent = i;
+        pagination.append(paginationButton);
+      }
       paginationButton.addEventListener('click', (e) => {
         currentPage = Number(e.target.innerText);
-        paginationPage = Number(e.target.innerText);
-        // console.log(`renderPagination -> currentPage:${currentPage}`);
+        renderPage = Number(e.target.innerText);
+        paginationPage = currentPage;
         renderAll();
       });
     }
+
     const currentPageNumber = get(`.pageNumber#page_${currentPage}`);
     if (currentPageNumber) {
       currentPageNumber.style.color = '#9dc0e8';
+    }
+    const beforePageNumber = get(`.pageNumber#page_${currentPage - 1}`);
+    if (beforePageNumber) {
+      const paginationButton = document.createElement('button');
+      paginationButton.textContent = '이전';
+      paginationButton.addEventListener('click', () => {
+        currentPage--;
+        renderPage = currentPage;
+        paginationPage = currentPage;
+        console.log(renderPage);
+        renderAll();
+      });
+      pagination.prepend(paginationButton);
+    }
+    const afterPageNumber = get(`.pageNumber#page_${currentPage + 1}`);
+    if (afterPageNumber) {
+      const paginationButton = document.createElement('button');
+      paginationButton.textContent = '다음';
+      paginationButton.addEventListener('click', () => {
+        currentPage++;
+        renderPage = currentPage;
+        paginationPage = currentPage;
+        console.log(renderPage);
+        renderAll();
+      });
+      pagination.append(paginationButton);
     }
   } catch (error) {
     console.error(error);
@@ -127,11 +182,11 @@ function listenFormEvent() {
     fetch(URL, postOptions)
       .then(() => {
         todoTag.innerHTML = '';
-        return renderAll();
+        renderAll();
       })
       .then(() => {
-        currentPage = maxPage;
-        console.log(`form -> maxPage:${maxPage}`);
+        renderPage = maxPage;
+        // console.log(`form -> renderPage:${renderPage}`);
         formInput.value = '';
         formInput.focus();
       })
@@ -186,7 +241,7 @@ function listenTodoEvent() {
         editButtons.style.display = 'none';
         editInput.value = label.innerText;
         break;
-      case 'todo_edit_cancel_button':
+      case 'todo_edit_confirm_button':
         fetch(`${URL}/${id}`, {
           method: 'PATCH',
           headers: {
