@@ -5,12 +5,13 @@ const todoTag = get('.todos');
 const pagination = get('.pagination');
 const form = get('.todo_form');
 const formInput = get('.todo_input');
-const todoLimit = 10;
+const todoLimit = 5;
 
 let currentPage = 1;
 let renderPage = 1;
 let paginationPage = 1;
 let maxPage = 1;
+let deletePage = false;
 
 function get(target) {
   return document.querySelector(target);
@@ -34,20 +35,11 @@ async function renderTodoList() {
   maxPage = totalPage;
   currentPage = renderPage;
 
-  console.log(
-    `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
-  );
-
   const isFirstOfList = totalPage * todoLimit - (todoLimit - 1) === todoLength;
 
-  if (isFirstOfList) {
-    // console.log(totalPage * todoLimit - (todoLimit - 1) + ' is true');
+  if (isFirstOfList && !deletePage) {
     renderPage = maxPage;
     currentPage = renderPage;
-
-    // console.log(
-    //   `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
-    // );
 
     const isOnPage = paginationPage !== 0;
 
@@ -55,10 +47,6 @@ async function renderTodoList() {
       renderPage = paginationPage;
       currentPage = paginationPage;
     }
-
-    // console.log(
-    //   `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
-    // );
   }
 
   function render() {
@@ -83,9 +71,6 @@ async function renderTodoList() {
 
   render();
   paginationPage = 0;
-  // console.log(
-  //   `totalPage:${totalPage} maxPage:${maxPage} & renderPage:${renderPage} currentPage:${currentPage} paginationPage:${paginationPage}`
-  // );
 }
 
 async function renderPagination() {
@@ -98,7 +83,7 @@ async function renderPagination() {
     maxPage = totalPage === 0 ? 1 : totalPage;
     pagination.innerHTML = '';
 
-    for (let i = 0; i < totalPage; i++) {
+    for (let i = 0; i <= totalPage; i++) {
       const paginationButton = document.createElement('button');
       paginationButton.className = 'pageNumber';
 
@@ -133,7 +118,6 @@ async function renderPagination() {
         currentPage--;
         renderPage = currentPage;
         paginationPage = currentPage;
-        console.log(renderPage);
         renderAll();
       });
       pagination.prepend(paginationButton);
@@ -146,7 +130,6 @@ async function renderPagination() {
         currentPage++;
         renderPage = currentPage;
         paginationPage = currentPage;
-        console.log(renderPage);
         renderAll();
       });
       pagination.append(paginationButton);
@@ -182,11 +165,11 @@ function listenFormEvent() {
     fetch(URL, postOptions)
       .then(() => {
         todoTag.innerHTML = '';
+        deletePage = false;
         renderAll();
       })
       .then(() => {
         renderPage = maxPage;
-        // console.log(`form -> renderPage:${renderPage}`);
         formInput.value = '';
         formInput.focus();
       })
@@ -263,6 +246,7 @@ function listenTodoEvent() {
         })
           .then(() => {
             todoTag.innerHTML = '';
+            deletePage = true;
             renderAll();
           })
           .catch((error) => {
