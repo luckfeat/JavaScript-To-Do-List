@@ -257,6 +257,45 @@ function listenTodoEvent() {
 
     return;
   });
+
+  todoTag.addEventListener('keydown', (e) => {
+    const item = e.target.closest('.item');
+    const label = item?.querySelector('label');
+    const editInput = item?.querySelector('input[type="text"]');
+    const contentButtons = item?.querySelector('.content_buttons');
+    const editButtons = item?.querySelector('.edit_buttons');
+    const value = editInput?.value;
+    const content = value;
+    const id = item?.dataset.id;
+
+    switch (e.key) {
+      case 'Escape':
+        label.style.display = 'block';
+        editInput.style.display = 'none';
+        contentButtons.style.display = 'block';
+        editButtons.style.display = 'none';
+        editInput.value = label.innerText;
+        break;
+      case 'Enter':
+        fetch(`${URL}/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ content }),
+        })
+          .then(() => {
+            todoTag.innerHTML = '';
+            renderAll();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+        break;
+    }
+
+    return;
+  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {

@@ -6,14 +6,14 @@ const template = /* html */ `
     class='todo_checkbox' 
     checked
     />
-    <label>{{content}}</label>
+    <label class="todo_edit_button">{{content}}</label>
     <input type="text" value="{{content}}" />
 {{else}}
     <input
     type="checkbox"
     class='todo_checkbox' 
     />
-    <label>{{content}}</label>
+    <label class="todo_edit_button">{{content}}</label>
     <input type="text" value="{{content}}" />
 {{/if}}
 </div>

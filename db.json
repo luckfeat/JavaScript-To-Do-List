@@ -1,3 +1,26 @@
 {
-  "todos": []
+  "todos": [
+    {
+      "content": "공복 유산소",
+      "completed": false,
+      "id": 1,
+      "recommended": false
+    },
+    {
+      "content": "다이어트",
+      "completed": false,
+      "id": 2,
+      "recommended": true
+    },
+    {
+      "content": "행복하기",
+      "completed": false,
+      "id": 3
+    },
+    {
+      "content": "유산소",
+      "completed": false,
+      "id": 4
+    }
+  ]
 }
